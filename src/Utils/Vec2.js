@@ -4,6 +4,10 @@ export default class Vec2 {
     return new Vec2(v2.x - v1.x, v2.y - v1.y);
   }
 
+  static fromAngle(a) {
+    return new Vec2(Math.cos(a), Math.sin(a));
+  }
+
   static add(v1, v2) {
     return new Vec2(v2.x + v1.x, v2.y + v1.y);
   }

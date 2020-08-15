@@ -1,27 +1,41 @@
 import * as PIXI from 'pixi.js';
 import Vec2 from '../Utils/Vec2';
 
+const asteroidSprites = [
+  'Assets/Image/Light/Asteroid 1.png',
+  'Assets/Image/Light/Asteroid 2.png',
+  'Assets/Image/Light/Asteroid 3.png',
+  'Assets/Image/Light/Asteroid 4.png'
+];
+
 class SmallAsteroid {
-  constructor() {
-    this.pixiObj = PIXI.Sprite.from('Assets/Image/Light/Bullet.png');
+  constructor(center, angle, bulletImpulse) {
+    this.type = 'SMOL';
+    this.pixiObj = PIXI.Sprite.from(asteroidSprites[Math.floor(Math.random() * 4)]);
+    this.pixiObj.zIndex = 20;
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.003;// temp up scale for debug // window.innerWidth * 0.001;
+    this.size = window.innerWidth * 0.0003;// temp up scale for debug // window.innerWidth * 0.001;
     this.hitRadius = window.innerWidth * 0.07;
     this.pixiObj.scale.set(this.size);
+    this.spin = (Math.random() - 0.5) * 3;
 
-    this.x = Math.random() * window.innerWidth;
-    this.y = Math.random() > 0.499 ? -this.size * 80 : window.innerHeight + this.size * 80;
+    this.pixiObj.tint = 0xAAAAAA;
+    this.flashTime = 0;
+    this.FLASH_MAX = 0.05;
 
-    this.velocity = new Vec2(Math.random() - 0.5, Math.random() - 0.5).normalize().scale(1);
+    this.velocity = Vec2.fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(45);
+    this.x = center.x + this.velocity.x * 0.3;
+    this.y = center.y + this.velocity.y * 0.3;
   
     // Set at start pos
     this.pixiObj.x = this.x;
     this.pixiObj.y = this.y;
-    this.life = 4;
+    this.life = 3;
   }
 
   takeHit() {
     this.life -= 1;
+    this.flashTime = this.FLASH_MAX;
   }
 
   checkHit(o) {
@@ -29,11 +43,19 @@ class SmallAsteroid {
   }
 
   update(dt) {
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
+    this.x += this.velocity.x * dt;
+    this.y += this.velocity.y * dt;
+    this.pixiObj.rotation += this.spin * dt;
+
+    if (this.flashTime > 0) {
+      this.flashTime -= dt;
+      this.pixiObj.tint = 0xFFFFFF;
+    } else {
+      this.pixiObj.tint = 0xBBBBBB;
+    }
 
     // Loop logic, should be same for all thing
-    const screenExtend = this.size * 80;
+    const screenExtend = this.size * 230;
     if (this.x > window.innerWidth + screenExtend) this.x = -screenExtend;
     if (this.x < -screenExtend) this.x = window.innerWidth + screenExtend;
     if (this.y > window.innerHeight + screenExtend) this.y = -screenExtend;

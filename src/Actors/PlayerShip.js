@@ -1,6 +1,16 @@
 import * as PIXI from 'pixi.js';
 import Vec2 from '../Utils/Vec2';
 
+const tints = [
+  0x08F7FE,
+  0x09FBD3,
+  0xFE53BB,
+  0xF5D300,
+  // 0x21006F,
+];
+
+const trailSize = 15;
+
 class PlayerShip {
   constructor(startX, startY) {
     this.pixiObj = PIXI.Sprite.from('Assets/Image/Light/Acme_A.png');
@@ -10,7 +20,24 @@ class PlayerShip {
     this.size = window.innerWidth * 0.001;
     this.hitRadius = window.innerWidth * 0.045;
     this.pixiObj.scale.set(this.size);
+    this.pixiObj._zIndex = 20;
     this.velocity = new Vec2(0, 0);
+    this.trailSprites = [];
+    this.trailPos = [];
+    this.tintShiftTime = 0.05;
+    this.TINT_SHIFT_WINDOW = 0.07;
+
+    for (let i = 0; i < trailSize; i++) {
+      const ts = PIXI.Sprite.from('Assets/Image/Light/Acme_A.png');
+      ts.x = startX;
+      ts.y = startY;
+      ts.game_tint_index = i % 5;
+      ts.tint = tints[ts.game_tint_index];
+      // ts.zIndex = trailSize - i;
+      ts.anchor.set(0.5, 0.5);
+      ts.scale.set(window.innerWidth * (0.0006 + 0.00035 * (trailSize - i) / trailSize));
+      this.trailSprites.push(ts);
+    }
   
     this.rotTarget = 0;
     // Set at start pos
@@ -35,6 +62,28 @@ class PlayerShip {
     this.y += this.velocity.y;
 
     this.pixiObj.rotation = this.rotTarget;
+
+
+    this.tintShiftTime -= dt;
+    if (this.tintShiftTime <0) {
+      this.trailPos.unshift(new Vec2(this.x, this.y));
+      if (this.trailPos.length > trailSize) {
+        this.trailPos.pop();
+      }
+      this.trailSprites.forEach((ts, i) => {
+        ts.rotation = this.rotTarget;
+        ts.game_tint_index = (ts.game_tint_index + 1) % tints.length;
+        ts.tint = tints[ts.game_tint_index];
+
+        if (this.trailPos.length > i) {
+          ts.x = this.trailPos[i].x;
+          ts.y = this.trailPos[i].y;
+        }
+      });
+
+    
+      this.tintShiftTime = this.TINT_SHIFT_WINDOW;
+    }
     // if (this.pixiObj.rotation < this.rotTarget - 0.02) this.pixiObj.rotation += dt * this.rotSpeed;
     // else if (this.pixiObj.rotation > this.rotTarget + 0.02) this.pixiObj.rotation -= dt * this.rotSpeed
 

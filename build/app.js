@@ -43580,26 +43580,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Utils/Vec2 */ "./src/Utils/Vec2.js");
 
 
+const asteroidSprites = ['Assets/Image/Light/Asteroid 1.png', 'Assets/Image/Light/Asteroid 2.png', 'Assets/Image/Light/Asteroid 3.png', 'Assets/Image/Light/Asteroid 4.png'];
 
 class Asteroid {
   constructor() {
-    this.pixiObj = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/Light/Bullet.png');
+    this.type = 'BIG';
+    this.pixiObj = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from(asteroidSprites[Math.floor(Math.random() * 4)]);
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.006; // temp up scale for debug // window.innerWidth * 0.001;
+    this.size = window.innerWidth * 0.0005; // temp up scale for debug // window.innerWidth * 0.001;
 
     this.hitRadius = window.innerWidth * 0.09;
+    this.spin = Math.random() - 0.5;
     this.pixiObj.scale.set(this.size);
+    this.pixiObj.tint = 0xAAAAAA;
+    this.flashTime = 0;
+    this.FLASH_MAX = 0.05;
     this.x = Math.random() * window.innerWidth;
-    this.y = Math.random() > 0.499 ? -this.size * 80 : window.innerHeight + this.size * 80;
-    this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](Math.random() - 0.5, Math.random() - 0.5).normalize().scale(1); // Set at start pos
+    this.y = Math.random() > 0.499 ? -this.size * 230 : window.innerHeight + this.size * 230;
+    this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](Math.random() - 0.5, Math.random() - 0.5).normalize().scale(35); // Set at start pos
 
     this.pixiObj.x = this.x;
     this.pixiObj.y = this.y;
-    this.life = 4;
+    this.life = 5;
   }
 
   takeHit() {
     this.life -= 1;
+    this.flashTime = this.FLASH_MAX;
   }
 
   checkHit(o) {
@@ -43607,10 +43614,19 @@ class Asteroid {
   }
 
   update(dt) {
-    this.x += this.velocity.x;
-    this.y += this.velocity.y; // Loop logic, should be same for all thing
+    this.x += this.velocity.x * dt;
+    this.y += this.velocity.y * dt;
+    this.pixiObj.rotation += this.spin * dt;
 
-    const screenExtend = this.size * 80;
+    if (this.flashTime > 0) {
+      this.flashTime -= dt;
+      this.pixiObj.tint = 0xFFFFFF;
+    } else {
+      this.pixiObj.tint = 0xBBBBBB;
+    } // Loop logic, should be same for all thing
+
+
+    const screenExtend = this.size * 230;
     if (this.x > window.innerWidth + screenExtend) this.x = -screenExtend;
     if (this.x < -screenExtend) this.x = window.innerWidth + screenExtend;
     if (this.y > window.innerHeight + screenExtend) this.y = -screenExtend;
@@ -43692,6 +43708,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Utils/Vec2 */ "./src/Utils/Vec2.js");
 
 
+const tints = [0x08F7FE, 0x09FBD3, 0xFE53BB, 0xF5D300 // 0x21006F,
+];
+const trailSize = 15;
 
 class PlayerShip {
   constructor(startX, startY) {
@@ -43702,7 +43721,25 @@ class PlayerShip {
     this.size = window.innerWidth * 0.001;
     this.hitRadius = window.innerWidth * 0.045;
     this.pixiObj.scale.set(this.size);
+    this.pixiObj._zIndex = 20;
     this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0);
+    this.trailSprites = [];
+    this.trailPos = [];
+    this.tintShiftTime = 0.05;
+    this.TINT_SHIFT_WINDOW = 0.07;
+
+    for (let i = 0; i < trailSize; i++) {
+      const ts = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/Light/Acme_A.png');
+      ts.x = startX;
+      ts.y = startY;
+      ts.game_tint_index = i % 5;
+      ts.tint = tints[ts.game_tint_index]; // ts.zIndex = trailSize - i;
+
+      ts.anchor.set(0.5, 0.5);
+      ts.scale.set(window.innerWidth * (0.0006 + 0.00035 * (trailSize - i) / trailSize));
+      this.trailSprites.push(ts);
+    }
+
     this.rotTarget = 0; // Set at start pos
 
     this.pixiObj.x = this.x;
@@ -43724,9 +43761,31 @@ class PlayerShip {
   update(dt) {
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    this.pixiObj.rotation = this.rotTarget; // if (this.pixiObj.rotation < this.rotTarget - 0.02) this.pixiObj.rotation += dt * this.rotSpeed;
+    this.pixiObj.rotation = this.rotTarget;
+    this.tintShiftTime -= dt;
+
+    if (this.tintShiftTime < 0) {
+      this.trailPos.unshift(new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](this.x, this.y));
+
+      if (this.trailPos.length > trailSize) {
+        this.trailPos.pop();
+      }
+
+      this.trailSprites.forEach((ts, i) => {
+        ts.rotation = this.rotTarget;
+        ts.game_tint_index = (ts.game_tint_index + 1) % tints.length;
+        ts.tint = tints[ts.game_tint_index];
+
+        if (this.trailPos.length > i) {
+          ts.x = this.trailPos[i].x;
+          ts.y = this.trailPos[i].y;
+        }
+      });
+      this.tintShiftTime = this.TINT_SHIFT_WINDOW;
+    } // if (this.pixiObj.rotation < this.rotTarget - 0.02) this.pixiObj.rotation += dt * this.rotSpeed;
     // else if (this.pixiObj.rotation > this.rotTarget + 0.02) this.pixiObj.rotation -= dt * this.rotSpeed
     // Loop logic, should be same for all thing
+
 
     const screenExtend = this.size * 40;
     if (this.x > window.innerWidth + screenExtend) this.x = -screenExtend;
@@ -43740,6 +43799,81 @@ class PlayerShip {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (PlayerShip);
+
+/***/ }),
+
+/***/ "./src/Actors/SmallAsteroid.js":
+/*!*************************************!*\
+  !*** ./src/Actors/SmallAsteroid.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/pixi.es.js");
+/* harmony import */ var _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Utils/Vec2 */ "./src/Utils/Vec2.js");
+
+
+const asteroidSprites = ['Assets/Image/Light/Asteroid 1.png', 'Assets/Image/Light/Asteroid 2.png', 'Assets/Image/Light/Asteroid 3.png', 'Assets/Image/Light/Asteroid 4.png'];
+
+class SmallAsteroid {
+  constructor(center, angle, bulletImpulse) {
+    this.type = 'SMOL';
+    this.pixiObj = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from(asteroidSprites[Math.floor(Math.random() * 4)]);
+    this.pixiObj.zIndex = 20;
+    this.pixiObj.anchor.set(0.5, 0.5);
+    this.size = window.innerWidth * 0.0003; // temp up scale for debug // window.innerWidth * 0.001;
+
+    this.hitRadius = window.innerWidth * 0.07;
+    this.pixiObj.scale.set(this.size);
+    this.spin = (Math.random() - 0.5) * 3;
+    this.pixiObj.tint = 0xAAAAAA;
+    this.flashTime = 0;
+    this.FLASH_MAX = 0.05;
+    this.velocity = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(45);
+    this.x = center.x + this.velocity.x * 0.3;
+    this.y = center.y + this.velocity.y * 0.3; // Set at start pos
+
+    this.pixiObj.x = this.x;
+    this.pixiObj.y = this.y;
+    this.life = 3;
+  }
+
+  takeHit() {
+    this.life -= 1;
+    this.flashTime = this.FLASH_MAX;
+  }
+
+  checkHit(o) {
+    return _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].dist2(this, o) < this.hitRadius * this.hitRadius + o.hitRadius * o.hitRadius;
+  }
+
+  update(dt) {
+    this.x += this.velocity.x * dt;
+    this.y += this.velocity.y * dt;
+    this.pixiObj.rotation += this.spin * dt;
+
+    if (this.flashTime > 0) {
+      this.flashTime -= dt;
+      this.pixiObj.tint = 0xFFFFFF;
+    } else {
+      this.pixiObj.tint = 0xBBBBBB;
+    } // Loop logic, should be same for all thing
+
+
+    const screenExtend = this.size * 230;
+    if (this.x > window.innerWidth + screenExtend) this.x = -screenExtend;
+    if (this.x < -screenExtend) this.x = window.innerWidth + screenExtend;
+    if (this.y > window.innerHeight + screenExtend) this.y = -screenExtend;
+    if (this.y < -screenExtend) this.y = window.innerHeight + screenExtend;
+    this.pixiObj.x = this.x;
+    this.pixiObj.y = this.y;
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (SmallAsteroid);
 
 /***/ }),
 
@@ -43804,6 +43938,10 @@ class Vec2 {
   // Static stuff
   static sub(v1, v2) {
     return new Vec2(v2.x - v1.x, v2.y - v1.y);
+  }
+
+  static fromAngle(a) {
+    return new Vec2(Math.cos(a), Math.sin(a));
   }
 
   static add(v1, v2) {
@@ -43946,20 +44084,106 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Actors_Bullet__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Actors/Bullet */ "./src/Actors/Bullet.js");
 /* harmony import */ var _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Utils/Vec2 */ "./src/Utils/Vec2.js");
 /* harmony import */ var _Actors_Asteroid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Actors/Asteroid */ "./src/Actors/Asteroid.js");
-/* harmony import */ var _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Utils/DebugOverlay */ "./src/Utils/DebugOverlay.js");
+/* harmony import */ var _Actors_SmallAsteroid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Actors/SmallAsteroid */ "./src/Actors/SmallAsteroid.js");
+/* harmony import */ var _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Utils/DebugOverlay */ "./src/Utils/DebugOverlay.js");
 
 
 
 
 
 
-let app, canvas, debug, player;
+
+let app, canvas, debug, player, scoreEl;
 let score = 0;
 const bullets = [];
 const asteroids = [];
+const splosions = [];
+let gameState = 'START';
+let asteroidSpawnTime = 5;
+let asteroidSpawnWindow = 6;
+let minSpawnWindow = 2;
+let spawnRateIncreaseCounter = 5;
+let spawnRateIncreaseInterval = 5;
+
+function mainUpdate(dt) {
+  // spawn asteroids
+  asteroidSpawnTime -= dt;
+
+  if (asteroidSpawnTime <= 0) {
+    // MAKE HARDER HERE
+    asteroidSpawnTime = asteroidSpawnWindow;
+    asteroids.push(new _Actors_Asteroid__WEBPACK_IMPORTED_MODULE_4__["default"]());
+    app.stage.addChild(asteroids[asteroids.length - 1].pixiObj);
+    spawnRateIncreaseCounter -= 1;
+
+    if (spawnRateIncreaseCounter <= 0 && asteroidSpawnWindow > minSpawnWindow) {
+      spawnRateIncreaseCounter = spawnRateIncreaseInterval;
+      asteroidSpawnWindow -= 0.25;
+    }
+  } // update the things
+
+
+  player.update(dt);
+  bullets.forEach(b => b.update(dt));
+  asteroids.forEach(a => {
+    a.update(dt); // Player die here
+
+    if (a.checkHit(player)) {
+      gameState = 'END';
+      document.getElementById('game-overlay').classList.add('hidden');
+      document.getElementById('end-overlay').classList.remove('hidden');
+      document.getElementById('end-score').innerHTML = score;
+    }
+
+    bullets.forEach(b => {
+      if (a.checkHit(b)) {
+        b.splode();
+        a.takeHit();
+      }
+    });
+  });
+  debug.update(player, bullets, asteroids); // Remove splosions
+  // const bulletToRemove = bullets.findIndex(b => b.life <= 0);
+  // if (bulletToRemove !== -1) {
+  //   bullets[bulletToRemove].pixiObj.destroy();
+  //   bullets.splice(bulletToRemove, 1);
+  //   // PARTICLES
+  // }
+  // Remove bullets
+
+  const bulletToRemove = bullets.findIndex(b => b.life <= 0);
+  const asteroidToRemove = asteroids.findIndex(a => a.life <= 0);
+
+  if (asteroidToRemove !== -1) {
+    if (asteroids[asteroidToRemove].type === 'BIG') {
+      const angle = Math.random() * Math.PI;
+      const interval = Math.PI * 2 / 3;
+
+      for (let i = 0; i < 3; i++) {
+        asteroids.push(new _Actors_SmallAsteroid__WEBPACK_IMPORTED_MODULE_5__["default"](asteroids[asteroidToRemove], angle + interval * i, bullets[bulletToRemove].velocity));
+        app.stage.addChild(asteroids[asteroids.length - 1].pixiObj);
+      }
+    } // ALSO ADD A SPLOSION AT THIS SPOT 
+
+
+    asteroids[asteroidToRemove].pixiObj.destroy();
+    asteroids.splice(asteroidToRemove, 1);
+    score += 1;
+    scoreEl.innerHTML = score;
+  } // Doing this after bc, whatever
+
+
+  if (bulletToRemove !== -1) {
+    bullets[bulletToRemove].pixiObj.destroy();
+    bullets.splice(bulletToRemove, 1); // PARTICLES
+  }
+}
+
+function endUpdate() {}
 
 function onLoad() {
   canvas = document.getElementById("pixi-overlay");
+  scoreEl = document.querySelector("#score");
   let type = "WebGL";
 
   if (!pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].isWebGLSupported()) {
@@ -43980,55 +44204,36 @@ function onLoad() {
     view: canvas
   });
   player = new _Actors_PlayerShip__WEBPACK_IMPORTED_MODULE_1__["default"](window.innerWidth / 2, window.innerHeight / 2);
+
+  for (let i = player.trailSprites.length - 1; i > -1; i--) {
+    app.stage.addChild(player.trailSprites[i]);
+  }
+
   app.stage.addChild(player.pixiObj);
-  debug = new _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_5__["default"]();
-  debug.enable();
+  debug = new _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_6__["default"](); // debug.enable();
+
+  debug.disable();
   app.stage.addChild(debug.pixiObj); // Listen for animate update
 
-  let dt;
-  let asteroidSpawnTime = 5;
-  let asteroidSpawnWindow = 5;
   app.ticker.add(delta => {
-    dt = delta / 60; // spawn asteroids
+    switch (gameState) {
+      case 'MAIN':
+        mainUpdate(delta / 60);
+        break;
 
-    asteroidSpawnTime -= dt;
+      case 'END':
+        endUpdate(delta / 60);
+        break;
 
-    if (asteroidSpawnTime <= 0) {
-      // MAKE HARDER HERE
-      asteroidSpawnTime = asteroidSpawnWindow;
-      asteroids.push(new _Actors_Asteroid__WEBPACK_IMPORTED_MODULE_4__["default"]());
-      app.stage.addChild(asteroids[asteroids.length - 1].pixiObj);
-    } // update the things
-
-
-    player.update(dt);
-    bullets.forEach(b => b.update(dt));
-    asteroids.forEach(a => {
-      a.update(dt); // Player die here
-
-      if (a.checkHit(player)) console.log('You die');
-      bullets.forEach(b => {
-        if (a.checkHit(b)) {
-          b.splode();
-          a.takeHit();
-        }
-      });
-    });
-    debug.update(player, bullets, asteroids); // Remove bullets
-
-    const bulletToRemove = bullets.findIndex(b => b.life <= 0);
-
-    if (bulletToRemove !== -1) {
-      bullets[bulletToRemove].pixiObj.destroy();
-      bullets.splice(bulletToRemove, 1); // PARTICLES
+      default:
+        break;
     }
+  }); // Set up name enter
 
-    const asteroidToRemove = asteroids.findIndex(a => a.life <= 0);
-
-    if (asteroidToRemove !== -1) {
-      asteroids[asteroidToRemove].pixiObj.destroy();
-      asteroids.splice(asteroidToRemove, 1);
-      score += 1;
+  document.getElementById('submit-score').addEventListener('click', () => {
+    if (gameState === 'END') {
+      console.log(document.getElementById('score-name').value);
+      location.reload();
     }
   }); // all the player interaction stuff
   // canvas.addEventListener('mouseup', (e) => {
@@ -44036,16 +44241,26 @@ function onLoad() {
   // });
 
   const mTouch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](0, 0);
-  canvas.addEventListener('touchmove', e => {
+  document.addEventListener('touchmove', e => {
     mTouch.set(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     player.setDirection(mTouch);
   });
-  canvas.addEventListener('touchend', e => {
-    const touch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-    const newB = new _Actors_Bullet__WEBPACK_IMPORTED_MODULE_2__["default"](touch, player);
-    player.addImpulse(touch);
-    bullets.push(newB);
-    app.stage.addChild(newB.pixiObj);
+  document.addEventListener('touchend', e => {
+    switch (gameState) {
+      case 'START':
+        gameState = 'MAIN';
+        document.getElementById('start-overlay').classList.add('hidden');
+        document.getElementById('game-overlay').classList.remove('hidden');
+        break;
+
+      default:
+        const touch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        const newB = new _Actors_Bullet__WEBPACK_IMPORTED_MODULE_2__["default"](touch, player);
+        player.addImpulse(touch);
+        bullets.push(newB);
+        app.stage.addChild(newB.pixiObj);
+        break;
+    }
   });
 }
 

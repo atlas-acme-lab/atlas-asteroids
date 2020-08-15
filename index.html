@@ -5,13 +5,33 @@
     <meta name="theme-color" content="#B12A34">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:image" content="./icons/mm-icon-512.png">
-    <script src="./build/app.js" defer></script>
     <!-- import the webpage's stylesheet -->
     <link rel="stylesheet" href="./style.css">
     
   </head>
 
   <body>
+    <div id="start-overlay">
+      <img src="Assets/Image/atlas_logo_full.png" alt="Atlas logo" class="atlas-logo">
+      <h2>ASTEROIDS</h2>
+    </div>
+
+    <div id="game-overlay" class="hidden">
+      <h2 id="score-header">SCORE: <span id="score">0</span></h2>
+    </div>
     <canvas id="pixi-overlay"></canvas>
+
+    <div id="end-overlay" class="hidden">
+      <h1 id="end-title">GAME OVER</h1>
+      <h2>You Scored</h2>
+      <h2 id="end-score"></h1>
+      <input type="text" id="score-name" name="name">
+      <button id="submit-score">SUBMIT</button>
+    </div>
+
+    <div id="high-score-overlay" class="hidden">
+    </div>
+
+    <script src="./build/app.js" defer></script>
   </body>
 </html>
