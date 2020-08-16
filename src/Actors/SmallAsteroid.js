@@ -23,7 +23,7 @@ class SmallAsteroid {
     this.flashTime = 0;
     this.FLASH_MAX = 0.05;
 
-    this.velocity = Vec2.fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(30);
+    this.velocity = Vec2.fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(35);
     this.x = center.x + this.velocity.x * 0.3;
     this.y = center.y + this.velocity.y * 0.3;
   

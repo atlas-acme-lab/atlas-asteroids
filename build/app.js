@@ -43597,7 +43597,7 @@ class Asteroid {
     this.FLASH_MAX = 0.05;
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() > 0.499 ? -this.size * 230 : window.innerHeight + this.size * 230;
-    this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](Math.random() - 0.5, Math.random() - 0.5).normalize().scale(20); // Set at start pos
+    this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](Math.random() - 0.5, Math.random() - 0.5).normalize().scale(25); // Set at start pos
 
     this.pixiObj.x = this.x;
     this.pixiObj.y = this.y;
@@ -43753,7 +43753,7 @@ class PlayerShip {
   }
 
   addImpulse(touch) {
-    const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.1);
+    const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.15);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
     this.velocity.add(dv);
@@ -43832,7 +43832,7 @@ class SmallAsteroid {
     this.pixiObj.tint = 0xAAAAAA;
     this.flashTime = 0;
     this.FLASH_MAX = 0.05;
-    this.velocity = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(30);
+    this.velocity = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(35);
     this.x = center.x + this.velocity.x * 0.3;
     this.y = center.y + this.velocity.y * 0.3; // Set at start pos
 

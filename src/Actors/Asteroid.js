@@ -24,7 +24,7 @@ class Asteroid {
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() > 0.499 ? -this.size * 230 : window.innerHeight + this.size * 230;
 
-    this.velocity = new Vec2(Math.random() - 0.5, Math.random() - 0.5).normalize().scale(20);
+    this.velocity = new Vec2(Math.random() - 0.5, Math.random() - 0.5).normalize().scale(25);
   
     // Set at start pos
     this.pixiObj.x = this.x;

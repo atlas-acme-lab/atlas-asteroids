@@ -53,7 +53,7 @@ class PlayerShip {
   }
 
   addImpulse(touch) {
-    const dv = Vec2.sub(touch, this).normalize().scale(0.1);
+    const dv = Vec2.sub(touch, this).normalize().scale(0.15);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
     this.velocity.add(dv);
