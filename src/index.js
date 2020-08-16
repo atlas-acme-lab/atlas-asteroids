@@ -105,10 +105,14 @@ function mainUpdate(dt) {
 function endUpdate() {
 
 }
-  
+
+let audio;
 function onLoad(){
   canvas = document.getElementById("pixi-overlay");
   scoreEl = document.querySelector("#score");
+
+  audio = new Audio('Assets/Sound/sd.wav');
+  audio.loop = true;
 
   let type = "WebGL"
   if(!PIXI.utils.isWebGLSupported()){
@@ -130,8 +134,8 @@ function onLoad(){
   }
   app.stage.addChild(player.pixiObj);
   debug = new DebugOverlay();
-  // debug.enable();
-  debug.disable();
+  debug.enable();
+  // debug.disable();
   app.stage.addChild(debug.pixiObj);
 
   // Listen for animate update
@@ -171,6 +175,7 @@ function onLoad(){
         gameState = 'MAIN';
         document.getElementById('start-overlay').classList.add('hidden');
         document.getElementById('game-overlay').classList.remove('hidden');
+        audio.play();
         break;
       default:
         const touch = new Vec2(e.changedTouches[0].clientX, e.changedTouches[0].clientY);

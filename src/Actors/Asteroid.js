@@ -13,8 +13,8 @@ class Asteroid {
     this.type = 'BIG';
     this.pixiObj = PIXI.Sprite.from(asteroidSprites[Math.floor(Math.random() * 4)]);
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.0005;// temp up scale for debug // window.innerWidth * 0.001;
-    this.hitRadius = window.innerWidth * 0.09;
+    this.size = window.innerWidth * 0.0004;// temp up scale for debug // window.innerWidth * 0.001;
+    this.hitRadius = window.innerWidth * 0.08;
     this.spin = (Math.random() - 0.5);
     this.pixiObj.scale.set(this.size);
     this.pixiObj.tint = 0xAAAAAA;
@@ -24,7 +24,7 @@ class Asteroid {
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() > 0.499 ? -this.size * 230 : window.innerHeight + this.size * 230;
 
-    this.velocity = new Vec2(Math.random() - 0.5, Math.random() - 0.5).normalize().scale(35);
+    this.velocity = new Vec2(Math.random() - 0.5, Math.random() - 0.5).normalize().scale(20);
   
     // Set at start pos
     this.pixiObj.x = this.x;

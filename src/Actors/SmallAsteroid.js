@@ -14,8 +14,8 @@ class SmallAsteroid {
     this.pixiObj = PIXI.Sprite.from(asteroidSprites[Math.floor(Math.random() * 4)]);
     this.pixiObj.zIndex = 20;
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.0003;// temp up scale for debug // window.innerWidth * 0.001;
-    this.hitRadius = window.innerWidth * 0.07;
+    this.size = window.innerWidth * 0.00025;// temp up scale for debug // window.innerWidth * 0.001;
+    this.hitRadius = window.innerWidth * 0.055;
     this.pixiObj.scale.set(this.size);
     this.spin = (Math.random() - 0.5) * 3;
 
@@ -23,7 +23,7 @@ class SmallAsteroid {
     this.flashTime = 0;
     this.FLASH_MAX = 0.05;
 
-    this.velocity = Vec2.fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(45);
+    this.velocity = Vec2.fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(30);
     this.x = center.x + this.velocity.x * 0.3;
     this.y = center.y + this.velocity.y * 0.3;
   

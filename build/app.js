@@ -43587,9 +43587,9 @@ class Asteroid {
     this.type = 'BIG';
     this.pixiObj = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from(asteroidSprites[Math.floor(Math.random() * 4)]);
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.0005; // temp up scale for debug // window.innerWidth * 0.001;
+    this.size = window.innerWidth * 0.0004; // temp up scale for debug // window.innerWidth * 0.001;
 
-    this.hitRadius = window.innerWidth * 0.09;
+    this.hitRadius = window.innerWidth * 0.08;
     this.spin = Math.random() - 0.5;
     this.pixiObj.scale.set(this.size);
     this.pixiObj.tint = 0xAAAAAA;
@@ -43597,7 +43597,7 @@ class Asteroid {
     this.FLASH_MAX = 0.05;
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() > 0.499 ? -this.size * 230 : window.innerHeight + this.size * 230;
-    this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](Math.random() - 0.5, Math.random() - 0.5).normalize().scale(35); // Set at start pos
+    this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](Math.random() - 0.5, Math.random() - 0.5).normalize().scale(20); // Set at start pos
 
     this.pixiObj.x = this.x;
     this.pixiObj.y = this.y;
@@ -43708,9 +43708,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Utils/Vec2 */ "./src/Utils/Vec2.js");
 
 
-const tints = [0x08F7FE, 0x09FBD3, 0xFE53BB, 0xF5D300 // 0x21006F,
+const tints = [0xFFFF77, 0xFF77FF, 0x000000, 0x77FFFF, 0xFFFFFF // 0x21006F,
 ];
-const trailSize = 15;
+const trailSize = 8;
 
 class PlayerShip {
   constructor(startX, startY) {
@@ -43718,8 +43718,8 @@ class PlayerShip {
     this.x = startX;
     this.y = startY;
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.001;
-    this.hitRadius = window.innerWidth * 0.045;
+    this.size = window.innerWidth * 0.0007;
+    this.hitRadius = window.innerWidth * 0.035;
     this.pixiObj.scale.set(this.size);
     this.pixiObj._zIndex = 20;
     this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0);
@@ -43736,7 +43736,8 @@ class PlayerShip {
       ts.tint = tints[ts.game_tint_index]; // ts.zIndex = trailSize - i;
 
       ts.anchor.set(0.5, 0.5);
-      ts.scale.set(window.innerWidth * (0.0006 + 0.00035 * (trailSize - i) / trailSize));
+      ts.scale.set(window.innerWidth * (0.0003 + 0.00025 * (trailSize - i) / trailSize));
+      ts.alpha = 0.3 + 0.4 * (trailSize - i) / trailSize;
       this.trailSprites.push(ts);
     }
 
@@ -43752,7 +43753,7 @@ class PlayerShip {
   }
 
   addImpulse(touch) {
-    const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.3);
+    const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.1);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
     this.velocity.add(dv);
@@ -43823,15 +43824,15 @@ class SmallAsteroid {
     this.pixiObj = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from(asteroidSprites[Math.floor(Math.random() * 4)]);
     this.pixiObj.zIndex = 20;
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.0003; // temp up scale for debug // window.innerWidth * 0.001;
+    this.size = window.innerWidth * 0.00025; // temp up scale for debug // window.innerWidth * 0.001;
 
-    this.hitRadius = window.innerWidth * 0.07;
+    this.hitRadius = window.innerWidth * 0.055;
     this.pixiObj.scale.set(this.size);
     this.spin = (Math.random() - 0.5) * 3;
     this.pixiObj.tint = 0xAAAAAA;
     this.flashTime = 0;
     this.FLASH_MAX = 0.05;
-    this.velocity = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(45);
+    this.velocity = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].fromAngle(angle).add(bulletImpulse.clone().normalize().scale(0.5)).scale(30);
     this.x = center.x + this.velocity.x * 0.3;
     this.y = center.y + this.velocity.y * 0.3; // Set at start pos
 
@@ -44181,9 +44182,13 @@ function mainUpdate(dt) {
 
 function endUpdate() {}
 
+let audio;
+
 function onLoad() {
   canvas = document.getElementById("pixi-overlay");
   scoreEl = document.querySelector("#score");
+  audio = new Audio('Assets/Sound/sd.wav');
+  audio.loop = true;
   let type = "WebGL";
 
   if (!pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].isWebGLSupported()) {
@@ -44210,9 +44215,9 @@ function onLoad() {
   }
 
   app.stage.addChild(player.pixiObj);
-  debug = new _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_6__["default"](); // debug.enable();
+  debug = new _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_6__["default"]();
+  debug.enable(); // debug.disable();
 
-  debug.disable();
   app.stage.addChild(debug.pixiObj); // Listen for animate update
 
   app.ticker.add(delta => {
@@ -44251,6 +44256,7 @@ function onLoad() {
         gameState = 'MAIN';
         document.getElementById('start-overlay').classList.add('hidden');
         document.getElementById('game-overlay').classList.remove('hidden');
+        audio.play();
         break;
 
       default:

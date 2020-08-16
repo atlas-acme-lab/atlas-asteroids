@@ -2,14 +2,15 @@ import * as PIXI from 'pixi.js';
 import Vec2 from '../Utils/Vec2';
 
 const tints = [
-  0x08F7FE,
-  0x09FBD3,
-  0xFE53BB,
-  0xF5D300,
+  0xFFFF77,
+  0xFF77FF,
+  0x000000,
+  0x77FFFF,
+  0xFFFFFF,
   // 0x21006F,
 ];
 
-const trailSize = 15;
+const trailSize = 8 ;
 
 class PlayerShip {
   constructor(startX, startY) {
@@ -17,8 +18,8 @@ class PlayerShip {
     this.x = startX;
     this.y = startY;
     this.pixiObj.anchor.set(0.5, 0.5);
-    this.size = window.innerWidth * 0.001;
-    this.hitRadius = window.innerWidth * 0.045;
+    this.size = window.innerWidth * 0.0007;
+    this.hitRadius = window.innerWidth * 0.035;
     this.pixiObj.scale.set(this.size);
     this.pixiObj._zIndex = 20;
     this.velocity = new Vec2(0, 0);
@@ -35,7 +36,8 @@ class PlayerShip {
       ts.tint = tints[ts.game_tint_index];
       // ts.zIndex = trailSize - i;
       ts.anchor.set(0.5, 0.5);
-      ts.scale.set(window.innerWidth * (0.0006 + 0.00035 * (trailSize - i) / trailSize));
+      ts.scale.set(window.innerWidth * (0.0003 + 0.00025 * (trailSize - i) / trailSize));
+      ts.alpha = 0.3 + 0.4 * (trailSize - i) / trailSize;
       this.trailSprites.push(ts);
     }
   
@@ -51,7 +53,7 @@ class PlayerShip {
   }
 
   addImpulse(touch) {
-    const dv = Vec2.sub(touch, this).normalize().scale(0.3);
+    const dv = Vec2.sub(touch, this).normalize().scale(0.1);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
     this.velocity.add(dv);
