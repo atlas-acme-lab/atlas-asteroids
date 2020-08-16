@@ -44215,9 +44215,9 @@ function onLoad() {
   }
 
   app.stage.addChild(player.pixiObj);
-  debug = new _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_6__["default"]();
-  debug.enable(); // debug.disable();
+  debug = new _Utils_DebugOverlay__WEBPACK_IMPORTED_MODULE_6__["default"](); // debug.enable();
 
+  debug.disable();
   app.stage.addChild(debug.pixiObj); // Listen for animate update
 
   app.ticker.add(delta => {

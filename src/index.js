@@ -134,8 +134,8 @@ function onLoad(){
   }
   app.stage.addChild(player.pixiObj);
   debug = new DebugOverlay();
-  debug.enable();
-  // debug.disable();
+  // debug.enable();
+  debug.disable();
   app.stage.addChild(debug.pixiObj);
 
   // Listen for animate update
