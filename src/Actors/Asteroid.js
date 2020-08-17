@@ -8,6 +8,7 @@ const asteroidSprites = [
   'Assets/Image/Light/Asteroid 4.png'
 ];
 
+let popSound = new Audio('Assets/Sound/boom1.mp3');
 class Asteroid {
   constructor() {
     this.type = 'BIG';
@@ -33,6 +34,9 @@ class Asteroid {
   }
 
   takeHit() {
+    popSound.currentTime = 0.0;
+    popSound.volume = 1
+    popSound.play();
     this.life -= 1;
     this.flashTime = this.FLASH_MAX;
   }

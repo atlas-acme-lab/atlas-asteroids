@@ -43581,6 +43581,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const asteroidSprites = ['Assets/Image/Light/Asteroid 1.png', 'Assets/Image/Light/Asteroid 2.png', 'Assets/Image/Light/Asteroid 3.png', 'Assets/Image/Light/Asteroid 4.png'];
+let popSound = new Audio('Assets/Sound/boom1.mp3');
 
 class Asteroid {
   constructor() {
@@ -43605,6 +43606,9 @@ class Asteroid {
   }
 
   takeHit() {
+    popSound.currentTime = 0.0;
+    popSound.volume = 1;
+    popSound.play();
     this.life -= 1;
     this.flashTime = this.FLASH_MAX;
   }
@@ -43711,6 +43715,8 @@ __webpack_require__.r(__webpack_exports__);
 const tints = [0xFFFF77, 0xFF77FF, 0x000000, 0x77FFFF, 0xFFFFFF // 0x21006F,
 ];
 const trailSize = 8;
+let laserSound = new Audio('Assets/Sound/laser.mp3');
+laserSound.volume = 0.4;
 
 class PlayerShip {
   constructor(startX, startY) {
@@ -43753,6 +43759,8 @@ class PlayerShip {
   }
 
   addImpulse(touch) {
+    laserSound.currentTime = 0.1;
+    laserSound.play();
     const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.15);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
@@ -43817,6 +43825,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const asteroidSprites = ['Assets/Image/Light/Asteroid 1.png', 'Assets/Image/Light/Asteroid 2.png', 'Assets/Image/Light/Asteroid 3.png', 'Assets/Image/Light/Asteroid 4.png'];
+let popSound = new Audio('Assets/Sound/boom1.mp3');
 
 class SmallAsteroid {
   constructor(center, angle, bulletImpulse) {
@@ -43842,6 +43851,9 @@ class SmallAsteroid {
   }
 
   takeHit() {
+    popSound.currentTime = 0.0;
+    popSound.volume = 1;
+    popSound.play();
     this.life -= 1;
     this.flashTime = this.FLASH_MAX;
   }
@@ -44189,6 +44201,7 @@ function onLoad() {
   scoreEl = document.querySelector("#score");
   audio = new Audio('Assets/Sound/sd.wav');
   audio.loop = true;
+  audio.volume = 0.4;
   let type = "WebGL";
 
   if (!pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].isWebGLSupported()) {
@@ -44237,14 +44250,22 @@ function onLoad() {
 
   document.getElementById('submit-score').addEventListener('click', () => {
     if (gameState === 'END') {
-      console.log(document.getElementById('score-name').value);
-      location.reload();
+      const data = {
+        name: 'peter',
+        score: '10'
+      };
+      console.log(document.getElementById('score-name').value); // fetch('https://atlas-asteroids.firebaseio.com/scores/', {
+      //   method: 'POST', // or 'PUT'
+      //   mode: 'cors',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(data),
+      // })
+      // .then((d) => console.log(d))
+      // .then(() => location.reload())
     }
-  }); // all the player interaction stuff
-  // canvas.addEventListener('mouseup', (e) => {
-  //   console.log('shoot', e)
-  // });
-
+  });
   const mTouch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](0, 0);
   document.addEventListener('touchmove', e => {
     mTouch.set(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
@@ -44259,12 +44280,15 @@ function onLoad() {
         audio.play();
         break;
 
-      default:
+      case 'MAIN':
         const touch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         const newB = new _Actors_Bullet__WEBPACK_IMPORTED_MODULE_2__["default"](touch, player);
         player.addImpulse(touch);
         bullets.push(newB);
         app.stage.addChild(newB.pixiObj);
+        break;
+
+      default:
         break;
     }
   });

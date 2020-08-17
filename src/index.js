@@ -113,6 +113,7 @@ function onLoad(){
 
   audio = new Audio('Assets/Sound/sd.wav');
   audio.loop = true;
+  audio.volume = 0.4;
 
   let type = "WebGL"
   if(!PIXI.utils.isWebGLSupported()){
@@ -154,16 +155,24 @@ function onLoad(){
   // Set up name enter
   document.getElementById('submit-score').addEventListener('click', () => {
     if (gameState === 'END') {
+      const data = {
+        name: 'peter',
+        score: '10',
+      }
       console.log(document.getElementById('score-name').value);
-      location.reload();
+      // fetch('https://atlas-asteroids.firebaseio.com/scores/', {
+      //   method: 'POST', // or 'PUT'
+      //   mode: 'cors',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(data),
+      // })
+      // .then((d) => console.log(d))
+      // .then(() => location.reload())
     }
   });
 
-
-  // all the player interaction stuff
-  // canvas.addEventListener('mouseup', (e) => {
-  //   console.log('shoot', e)
-  // });
   const mTouch = new Vec2(0, 0);
   document.addEventListener('touchmove', (e) => {
     mTouch.set(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
@@ -177,13 +186,14 @@ function onLoad(){
         document.getElementById('game-overlay').classList.remove('hidden');
         audio.play();
         break;
-      default:
+      case 'MAIN':
         const touch = new Vec2(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         const newB = new Bullet(touch, player);
         player.addImpulse(touch);
         bullets.push(newB);
         app.stage.addChild(newB.pixiObj);
         break;
+      default: break;
     }
   });
 }

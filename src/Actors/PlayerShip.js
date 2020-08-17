@@ -12,6 +12,9 @@ const tints = [
 
 const trailSize = 8 ;
 
+let laserSound = new Audio('Assets/Sound/laser.mp3');
+laserSound.volume = 0.4;
+
 class PlayerShip {
   constructor(startX, startY) {
     this.pixiObj = PIXI.Sprite.from('Assets/Image/Light/Acme_A.png');
@@ -53,6 +56,8 @@ class PlayerShip {
   }
 
   addImpulse(touch) {
+    laserSound.currentTime = 0.1;
+    laserSound.play();
     const dv = Vec2.sub(touch, this).normalize().scale(0.15);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
