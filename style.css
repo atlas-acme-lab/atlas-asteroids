@@ -78,3 +78,18 @@ canvas.off-screen {
   -ms-user-select: none;
   user-select: none;
 }
+
+#end-title {
+  color: white;
+  margin-top: 56vw;
+}
+
+#submit-score {
+  font-size: 6vw;
+  padding: 4vw;
+  background: black;
+  border: 3px solid white;
+  color: white;
+  margin-top: 4vw;
+  border-radius: 10px;
+}

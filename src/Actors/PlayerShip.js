@@ -58,7 +58,7 @@ class PlayerShip {
   addImpulse(touch) {
     laserSound.currentTime = 0.1;
     laserSound.play();
-    const dv = Vec2.sub(touch, this).normalize().scale(0.15);
+    const dv = Vec2.sub(touch, this).normalize().scale(0.2);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
     this.velocity.add(dv);

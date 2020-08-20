@@ -43761,7 +43761,7 @@ class PlayerShip {
   addImpulse(touch) {
     laserSound.currentTime = 0.1;
     laserSound.play();
-    const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.15);
+    const dv = _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"].sub(touch, this).normalize().scale(0.2);
     this.pixiObj.rotation = dv.getAngle() - Math.PI / 2;
     this.setDirection(touch);
     this.velocity.add(dv);
@@ -44117,6 +44117,7 @@ let asteroidSpawnWindow = 6;
 let minSpawnWindow = 2;
 let spawnRateIncreaseCounter = 5;
 let spawnRateIncreaseInterval = 5;
+let endTitleDiv;
 
 function mainUpdate(dt) {
   // spawn asteroids
@@ -44192,13 +44193,28 @@ function mainUpdate(dt) {
   }
 }
 
-function endUpdate() {}
+let colorChangeTime = 0;
+let colorIndex = 0;
+const tints = ['#FFFF77', '#FF77FF', // '#000000',
+'#77FFFF', '#FFFFFF'];
+
+function endUpdate(dt) {
+  colorChangeTime -= dt;
+
+  if (colorChangeTime <= 0) {
+    colorChangeTime = 1 / 15;
+    endTitleDiv.style = "color: " + tints[colorIndex];
+    colorIndex += 1;
+    colorIndex %= tints.length;
+  }
+}
 
 let audio;
 
 function onLoad() {
   canvas = document.getElementById("pixi-overlay");
   scoreEl = document.querySelector("#score");
+  endTitleDiv = document.querySelector('#end-title');
   audio = new Audio('Assets/Sound/sd.wav');
   audio.loop = true;
   audio.volume = 0.4;
@@ -44250,11 +44266,14 @@ function onLoad() {
 
   document.getElementById('submit-score').addEventListener('click', () => {
     if (gameState === 'END') {
-      const data = {
-        name: 'peter',
-        score: '10'
-      };
-      console.log(document.getElementById('score-name').value); // fetch('https://atlas-asteroids.firebaseio.com/scores/', {
+      location.reload(); // const data = {
+      //   name: 'peter',
+      //   score: '10',
+      // }
+      // //
+      // //https://asteroids-test-485ae.firebaseio.com/
+      // console.log(document.getElementById('score-name').value);
+      // fetch('https://us-central1-asteroids-test-485ae.cloudfunctions.net/addScore', {
       //   method: 'POST', // or 'PUT'
       //   mode: 'cors',
       //   headers: {
@@ -44263,6 +44282,16 @@ function onLoad() {
       //   body: JSON.stringify(data),
       // })
       // .then((d) => console.log(d))
+      // .then(() => {
+      //   fetch('https://us-central1-asteroids-test-485ae.cloudfunctions.net/getScores', {
+      //     method: 'POST', // or 'PUT'
+      //     mode: 'cors',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //   })
+      //   .then((b) => console.log(b))
+      // })
       // .then(() => location.reload())
     }
   });
