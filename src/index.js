@@ -21,9 +21,35 @@ let spawnRateIncreaseCounter = 5;
 let spawnRateIncreaseInterval = 5;
 let endTitleDiv;
 
+let leftANum = 1;
+let rightANum = 1;
+let leftATimer = 0.5;
+let rightATimer = 0.8
+
 function startUpdate(dt) {
   // spawn asteroids
   // asteroidSpawnTime -= dt;
+  leftATimer -= dt;
+  rightATimer -= dt;
+  if (leftATimer < 0) {
+    // console.log(`#left-a-${leftANum}`);
+    document.querySelector(`#left-a-${leftANum}`).classList.add('hidden');
+
+    leftATimer = 0.4;
+    leftANum = ((leftANum + 1) % 13);
+    if (leftANum === 0) leftANum = 1;
+    document.querySelector(`#left-a-${leftANum}`).classList.remove('hidden');
+  }
+
+  if (rightATimer < 0) {
+    // console.log(`#left-a-${leftANum}`);
+    document.querySelector(`#right-a-${rightANum}`).classList.add('hidden');
+
+    rightATimer = 0.3;
+    rightANum = ((rightANum + 1) % 11);
+    if (rightANum === 0) rightANum = 1;
+    document.querySelector(`#right-a-${rightANum}`).classList.remove('hidden');
+  }
 
   // update the things
   player.update(dt);

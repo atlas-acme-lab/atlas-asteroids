@@ -81,13 +81,21 @@ canvas.off-screen {
   left: 5vw;
 }
 
+.atlas-left-a.hidden {
+  display: none;
+}
+
 .atlas-right-a {
   display: block;
-    position: absolute;
-    z-index: 20;
-    width: 21.5vw;
-    top: 20vw;
-    left: 55.5vw;
+  position: absolute;
+  z-index: 20;
+  width: 21.5vw;
+  top: 20vw;
+  left: 55.5vw;
+}
+
+.atlas-right-a.hidden {
+  display: none;
 }
 
 .unselectable {
