@@ -23,7 +23,7 @@ let endTitleDiv;
 
 function startUpdate(dt) {
   // spawn asteroids
-  asteroidSpawnTime -= dt;
+  // asteroidSpawnTime -= dt;
 
   // update the things
   player.update(dt);
@@ -169,6 +169,7 @@ function onLoad(){
     switch (gameState) {
       case 'START':
         startUpdate(delta / 60);
+        break;
       case 'MAIN':
         mainUpdate(delta / 60);
         break;

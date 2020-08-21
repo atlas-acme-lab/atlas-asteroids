@@ -69,6 +69,7 @@ canvas.off-screen {
   width: 70vw;
   margin: 0 auto;
   margin-top: 20vw;
+  margin-left: 24vw;
 }
 
 .atlas-left-a {
