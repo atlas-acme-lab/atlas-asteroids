@@ -43714,20 +43714,25 @@ __webpack_require__.r(__webpack_exports__);
 
 const tints = [0xFFFF77, 0xFF77FF, 0x000000, 0x77FFFF, 0xFFFFFF // 0x21006F,
 ];
+const sprites = [pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/PlayerAs/acme-a.png'), pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/PlayerAs/bio-a.png'), pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/PlayerAs/data-a.png'), pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/PlayerAs/thing-a.png'), pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/PlayerAs/nano-a.png'), pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/PlayerAs/unstable-a.png')];
 const trailSize = 8;
 let laserSound = new Audio('Assets/Sound/laser.mp3');
 laserSound.volume = 0.4;
 
 class PlayerShip {
   constructor(startX, startY) {
-    this.pixiObj = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from('Assets/Image/Light/Acme_A.png');
     this.x = startX;
     this.y = startY;
-    this.pixiObj.anchor.set(0.5, 0.5);
     this.size = window.innerWidth * 0.0007;
     this.hitRadius = window.innerWidth * 0.035;
-    this.pixiObj.scale.set(this.size);
-    this.pixiObj._zIndex = 20;
+    this.spriteID = 0; // of 6 total sprites
+
+    this.pixiObj = sprites[0];
+    sprites.forEach(s => {
+      s.anchor.set(0.5, 0.5);
+      s.scale.set(this.size / 4);
+      s._zIndex = 20;
+    });
     this.velocity = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0);
     this.trailSprites = [];
     this.trailPos = [];
@@ -43751,6 +43756,10 @@ class PlayerShip {
 
     this.pixiObj.x = this.x;
     this.pixiObj.y = this.y;
+  }
+
+  setSprite() {
+    this.pixiObj = sprites[this.spriteID];
   } // expects a vec 2
 
 
@@ -44119,6 +44128,13 @@ let spawnRateIncreaseCounter = 5;
 let spawnRateIncreaseInterval = 5;
 let endTitleDiv;
 
+function startUpdate(dt) {
+  // spawn asteroids
+  asteroidSpawnTime -= dt; // update the things
+
+  player.update(dt);
+}
+
 function mainUpdate(dt) {
   // spawn asteroids
   asteroidSpawnTime -= dt;
@@ -44251,6 +44267,9 @@ function onLoad() {
 
   app.ticker.add(delta => {
     switch (gameState) {
+      case 'START':
+        startUpdate(delta / 60);
+
       case 'MAIN':
         mainUpdate(delta / 60);
         break;
@@ -44302,6 +44321,20 @@ function onLoad() {
   });
   document.addEventListener('touchend', e => {
     switch (gameState) {
+      case 'MAIN':
+        const touch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        const newB = new _Actors_Bullet__WEBPACK_IMPORTED_MODULE_2__["default"](touch, player);
+        player.addImpulse(touch);
+        bullets.push(newB);
+        app.stage.addChild(newB.pixiObj);
+        break;
+
+      default:
+        break;
+    }
+  });
+  document.querySelector('#begin-button').addEventListener('click', e => {
+    switch (gameState) {
       case 'START':
         gameState = 'MAIN';
         document.getElementById('start-overlay').classList.add('hidden');
@@ -44309,12 +44342,18 @@ function onLoad() {
         audio.play();
         break;
 
-      case 'MAIN':
-        const touch = new _Utils_Vec2__WEBPACK_IMPORTED_MODULE_3__["default"](e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-        const newB = new _Actors_Bullet__WEBPACK_IMPORTED_MODULE_2__["default"](touch, player);
-        player.addImpulse(touch);
-        bullets.push(newB);
-        app.stage.addChild(newB.pixiObj);
+      default:
+        break;
+    }
+  });
+  document.querySelector('#cycle-left-a').addEventListener('click', e => {
+    switch (gameState) {
+      case 'START':
+        player.spriteID -= 1;
+        if (player.spriteID < 0) player.spriteID = 5;
+        app.stage.removeChild(player.pixiObj);
+        player.setSprite();
+        app.stage.addChild(player.pixiObj);
         break;
 
       default:

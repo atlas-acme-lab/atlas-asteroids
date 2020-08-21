@@ -10,6 +10,15 @@ const tints = [
   // 0x21006F,
 ];
 
+const sprites = [
+  PIXI.Sprite.from('Assets/Image/PlayerAs/acme-a.png'),
+  PIXI.Sprite.from('Assets/Image/PlayerAs/bio-a.png'),
+  PIXI.Sprite.from('Assets/Image/PlayerAs/data-a.png'),
+  PIXI.Sprite.from('Assets/Image/PlayerAs/thing-a.png'),
+  PIXI.Sprite.from('Assets/Image/PlayerAs/nano-a.png'),
+  PIXI.Sprite.from('Assets/Image/PlayerAs/unstable-a.png'),
+];
+
 const trailSize = 8 ;
 
 let laserSound = new Audio('Assets/Sound/laser.mp3');
@@ -17,19 +26,25 @@ laserSound.volume = 0.4;
 
 class PlayerShip {
   constructor(startX, startY) {
-    this.pixiObj = PIXI.Sprite.from('Assets/Image/Light/Acme_A.png');
     this.x = startX;
     this.y = startY;
-    this.pixiObj.anchor.set(0.5, 0.5);
     this.size = window.innerWidth * 0.0007;
     this.hitRadius = window.innerWidth * 0.035;
-    this.pixiObj.scale.set(this.size);
-    this.pixiObj._zIndex = 20;
+    this.spriteID = 0; // of 6 total sprites
+  
+    this.pixiObj = sprites[0];
+    sprites.forEach(s => {
+      s.anchor.set(0.5, 0.5);
+      s.scale.set(this.size / 4);
+      s._zIndex = 20;
+    });
+  
     this.velocity = new Vec2(0, 0);
     this.trailSprites = [];
     this.trailPos = [];
     this.tintShiftTime = 0.05;
     this.TINT_SHIFT_WINDOW = 0.07;
+
 
     for (let i = 0; i < trailSize; i++) {
       const ts = PIXI.Sprite.from('Assets/Image/Light/Acme_A.png');
@@ -48,6 +63,10 @@ class PlayerShip {
     // Set at start pos
     this.pixiObj.x = this.x;
     this.pixiObj.y = this.y;
+  }
+
+  setSprite() {
+    this.pixiObj = sprites[this.spriteID];
   }
 
   // expects a vec 2

@@ -21,6 +21,14 @@ let spawnRateIncreaseCounter = 5;
 let spawnRateIncreaseInterval = 5;
 let endTitleDiv;
 
+function startUpdate(dt) {
+  // spawn asteroids
+  asteroidSpawnTime -= dt;
+
+  // update the things
+  player.update(dt);
+}
+
 function mainUpdate(dt) {
   // spawn asteroids
   asteroidSpawnTime -= dt;
@@ -159,6 +167,8 @@ function onLoad(){
   // Listen for animate update
   app.ticker.add((delta) => {
     switch (gameState) {
+      case 'START':
+        startUpdate(delta / 60);
       case 'MAIN':
         mainUpdate(delta / 60);
         break;
@@ -210,18 +220,38 @@ function onLoad(){
   });
   document.addEventListener('touchend', (e) => {
     switch (gameState) {
-      case 'START':
-        gameState = 'MAIN';
-        document.getElementById('start-overlay').classList.add('hidden');
-        document.getElementById('game-overlay').classList.remove('hidden');
-        audio.play();
-        break;
       case 'MAIN':
         const touch = new Vec2(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         const newB = new Bullet(touch, player);
         player.addImpulse(touch);
         bullets.push(newB);
         app.stage.addChild(newB.pixiObj);
+        break;
+      default: break;
+    }
+  });
+
+  document.querySelector('#begin-button').addEventListener('click', (e) => {
+    switch (gameState) {
+      case 'START':
+        gameState = 'MAIN';
+        document.getElementById('start-overlay').classList.add('hidden');
+        document.getElementById('game-overlay').classList.remove('hidden');
+        audio.play();
+        break;
+      default: break;
+    }
+  });
+
+  document.querySelector('#cycle-left-a').addEventListener('click', (e) => {
+    switch (gameState) {
+      case 'START':
+        player.spriteID -= 1;
+        if (player.spriteID < 0) player.spriteID = 5;
+
+        app.stage.removeChild(player.pixiObj);
+        player.setSprite();
+        app.stage.addChild(player.pixiObj);
         break;
       default: break;
     }
