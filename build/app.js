@@ -44360,6 +44360,20 @@ function onLoad() {
         break;
     }
   });
+  document.querySelector('#cycle-right-a').addEventListener('click', e => {
+    switch (gameState) {
+      case 'START':
+        player.spriteID += 1;
+        if (player.spriteID > 5) player.spriteID = 0;
+        app.stage.removeChild(player.pixiObj);
+        player.setSprite();
+        app.stage.addChild(player.pixiObj);
+        break;
+
+      default:
+        break;
+    }
+  });
 }
 
 window.onload = onLoad;
